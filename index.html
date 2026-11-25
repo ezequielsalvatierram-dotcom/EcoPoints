@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoPoints - Plataforma de Reciclaje y Sostenibilidad</title>
+    <link rel="icon" type="image/svg+xml" href="img/ecopoints-icon.svg">
+    
+    <!-- Tipografía Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+<!-- Mapa Leaflet.js -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Hoja de Estilos Externa CSS3 (Verde y Blanco) -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-requires-auth="true">
+
+    <!-- ==========================================
+         BARRA SUPERIOR (HEADER Y NAVEGACIÓN)
+         ========================================== -->
+    <header class="header">
+        <div class="navbar">
+            <button class="logo" type="button" onclick="navigateTo('inicio')" aria-label="Ir al inicio">
+                <span class="logo-mark" aria-hidden="true">E</span>
+                <span>EcoPoints</span>
+            </button>
+
+            <!-- Navegación adaptable (móviles y tablets) -->
+            <button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menú de navegación" aria-controls="navLinks" aria-expanded="false">Menú</button>
+
+            <!-- Navegación principal -->
+            <nav class="main-navigation" aria-label="Navegación principal">
+                <ul class="nav-links" id="navLinks">
+                <li><button class="active" aria-current="page" type="button" onclick="navigateTo('inicio')">Inicio</button></li>
+                <li><button type="button" onclick="navigateTo('clasificacion')">Clasificación</button></li>
+                <li><button type="button" onclick="navigateTo('puntos')">Puntos de Reciclaje</button></li>
+                <li><button type="button" onclick="navigateTo('retos')">Retos</button></li>
+                <li><button type="button" onclick="navigateTo('recompensas')">Recompensas</button></li>
+                <li><button type="button" onclick="navigateTo('perfil')">Mi Perfil</button></li>
+                <li class="nav-logout"><button id="logoutButton" type="button">Cerrar sesión</button></li>
+                </ul>
+            </nav>
+
+        </div>
+    </header>
+
+    <!-- ==========================================
+         CONTENEDOR DE SECCIONES PRINCIPALES
+         ========================================== -->
+    <a class="skip-link" href="#mainContent">Saltar al contenido</a>
+    <main class="container" id="mainContent" tabindex="-1">
+
+        <!-- ====================================================
+             SECCIÓN 1: INICIO
+             ==================================================== -->
+        <section id="sec-inicio" class="section active">
+            <!-- Hero Principal -->
+            <div class="hero">
+                <div class="hero-text">
+                    <span class="hero-badge">Plataforma Sostenible</span>
+                    <h1 class="hero-title" id="ecoWelcomeName">¡Bienvenido a EcoPoints!</h1>
+                    <p class="hero-desc">
+                        Te damos la bienvenida. Aquí puedes aprender a clasificar tus residuos, encontrar puntos de reciclaje, participar en retos y convertir tus acciones sostenibles en recompensas.
+                    </p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" type="button" onclick="openRecycleModal()">Registrar entrega
+                        </button>
+                        <button class="btn btn-outline" type="button" onclick="navigateTo('clasificacion')">Guía de separación
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de Saldo y Resumen -->
+                <div class="hero-card">
+                    <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Tu Balance Actual</div>
+                    <div class="hero-card-points" id="heroPoints">0</div>
+                    <button class="btn btn-outline btn-sm" type="button" style="width: 100%;" onclick="navigateTo('recompensas')">
+                        Canjear premios &rarr;
+                    </button>
+                </div>
+            </div>
+
+            <!-- Métricas de Impacto -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    
+                    <div>
+                        <div class="stat-val" id="statKg">34.8 kg</div>
+                        <div class="stat-lbl">Material reciclado</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    
+                    <div>
+                        <div class="stat-val" id="statCo2">45.2 kg</div>
+                        <div class="stat-lbl">CO₂ mitigado</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    
+                    <div>
+                        <div class="stat-val">410 L</div>
+                        <div class="stat-lbl">Agua ahorrada</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    
+                    <div>
+                        <div class="stat-val">5 sem.</div>
+                        <div class="stat-lbl">Racha ecológica</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reto destacado -->
+            <div class="challenge-banner">
+                <div style="flex: 1; min-width: 260px;">
+                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px;">
+                        <span id="homeChallengeStatus" style="font-size: 0.75rem; font-weight: 700; color: var(--primary-green-dark); text-transform: uppercase;">
+                             Reto activo
+                        </span>
+                        <span class="challenge-time-limit" id="homeChallengeTimeLimit">Duración: 7 días</span>
+                    </div>
+                    <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-dark);">Botellas al Rescate (PET)</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Recicla 3.0 kg de envases plásticos y recibe +180 EcoPoints de regalo.</p>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: 0%;"></div>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between;">
+                        <span>Progreso: <strong>0.0 kg de 3.0 kg</strong></span>
+                        <span style="color: var(--primary-green-dark); font-weight: 700;">0% completado</span>
+                    </div>
+                </div>
+                <button class="btn btn-outline btn-sm" type="button" onclick="openRecycleModal()">
+                    Completar reto
+                </button>
+            </div>
+        </section>
+
+        <!-- ====================================================
+             SECCIÓN 2: CLASIFICACIÓN DE RESIDUOS
+             ==================================================== -->
+        <section id="sec-clasificacion" class="section">
+            <div class="section-header">
+                <h2 class="section-title">Clasificación de Residuos</h2>
+                <p class="section-subtitle">Aprende a separar y preparar correctamente tus materiales para maximizar su reciclaje.</p>
+            </div>
+
+            <div class="waste-grid">
+                <!-- Plástico -->
+                <div class="waste-card waste-plastic">
+                    <div>
+                        <div class="waste-header">
+                            
+                            <div>
+                                <h3 class="waste-title">Plástico</h3>
+                                <div class="waste-pts">+50 EcoPoints / kg</div>
+                            </div>
+                        </div>
+                        <div class="waste-image-frame">
+                            <img class="waste-category-image" src="img/plastico.jpg" alt="Ejemplos de residuos de plástico" loading="lazy">
+                        </div>
+                        <ul class="waste-list">
+                            <li> Botellas de agua, gaseosas y jugos (PET 1).</li>
+                            <li> Envases de shampoo y detergentes (PEAD 2).</li>
+                            <li> Evita envases con grasa o restos químicos.</li>
+                        </ul>
+                    </div>
+                    <div class="waste-tip">
+                        <strong>Preparación:</strong> Enjuaga con un poco de agua, retira etiquetas y aplasta para reducir volumen.
+                    </div>
+                </div>
+
+                <!-- Papel y Cartón -->
+                <div class="waste-card waste-paper">
+                    <div>
+                        <div class="waste-header">
+                            
+                            <div>
+                                <h3 class="waste-title">Papel y Cartón</h3>
+                                <div class="waste-pts">+30 EcoPoints / kg</div>
+                            </div>
+                        </div>
+                        <div class="waste-image-frame">
+                            <img class="waste-category-image" src="img/PapelyCarton.jfif" alt="Ejemplos de papel y cartón" loading="lazy">
+                        </div>
+                        <ul class="waste-list">
+                            <li> Cajas de cartón corrugado limpias y desarmadas.</li>
+                            <li> Hojas de cuaderno, periódicos y revistas.</li>
+                            <li> No incluir cajas de pizza manchadas de grasa.</li>
+                        </ul>
+                    </div>
+                    <div class="waste-tip">
+                        <strong>Preparación:</strong> Mantén el material 100% seco y amarra las cajas plegadas en paquetes.
+                    </div>
+                </div>
+
+                <!-- Vidrio -->
+                <div class="waste-card waste-glass">
+                    <div>
+                        <div class="waste-header">
+                            
+                            <div>
+                                <h3 class="waste-title">Vidrio</h3>
+                                <div class="waste-pts">+40 EcoPoints / kg</div>
+                            </div>
+                        </div>
+                        <div class="waste-image-frame">
+                            <img class="waste-category-image" src="img/vidrio.jfif" alt="Ejemplos de envases de vidrio" loading="lazy">
+                        </div>
+                        <ul class="waste-list">
+                            <li> Botellas de vino, cerveza y gaseosas.</li>
+                            <li> Frascos de conservas y mermeladas.</li>
+                            <li> No vidrios planos de ventana ni espejos.</li>
+                        </ul>
+                    </div>
+                    <div class="waste-tip">
+                        <strong>Preparación:</strong> Retira las tapas metálicas o corchos y entrega las piezas enteras sin romper.
+                    </div>
+                </div>
+
+                <!-- Aluminio -->
+                <div class="waste-card waste-aluminum">
+                    <div>
+                        <div class="waste-header">
+                            
+                            <div>
+                                <h3 class="waste-title">Aluminio</h3>
+                                <div class="waste-pts">+120 EcoPoints / kg</div>
+                            </div>
+                        </div>
+                        <div class="waste-image-frame">
+                            <img class="waste-category-image" src="img/aluminio.jfif" alt="Ejemplos de residuos de aluminio" loading="lazy">
+                        </div>
+                        <ul class="waste-list">
+                            <li> Latas de gaseosa, cerveza y bebidas energéticas.</li>
+                            <li> Latas de atún y conservas lavadas.</li>
+                            <li> No aerosoles bajo presión.</li>
+                        </ul>
+                    </div>
+                    <div class="waste-tip">
+                        <strong>Preparación:</strong> Lava bien para evitar olores y pisa las latas para que ocupen menos espacio.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====================================================
+             SECCIÓN 3: PUNTOS DE RECICLAJE (MAPA INTERACTIVO)
+             ==================================================== -->
+        <section id="sec-puntos" class="section">
+            <div class="section-admin-header">
+                <div class="section-header">
+                    <h2 class="section-title">Puntos de Reciclaje Cercanos</h2>
+                    <p class="section-subtitle">Ubica centros de recolección habilitados en el mapa interactivo para entregar tus materiales.</p>
+                </div>
+                <button class="btn btn-primary btn-sm admin-action" id="adminAddPointButton" type="button" onclick="openAdminModal('modalAddPoint')" hidden>
+                     Agregar punto
+                </button>
+            </div>
+
+            <div class="map-wrapper">
+                <!-- Contenedor del Mapa Leaflet -->
+                <div id="leafletMap"></div>
+
+                <!-- Lista lateral de estaciones -->
+                <div class="map-sidebar">
+                    <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 4px;">Estaciones Disponibles</h3>
+                    <div id="locationsList"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====================================================
+             SECCIÓN 4: RETOS AMBIENTALES
+             ==================================================== -->
+        <section id="sec-retos" class="section">
+            <div class="section-admin-header">
+                <div class="section-header">
+                    <h2 class="section-title">Retos Ambientales</h2>
+                    <p class="section-subtitle">Participa en desafíos ecológicos para ganar bonificaciones de EcoPoints adicionales.</p>
+                </div>
+                <button class="btn btn-primary btn-sm admin-action" id="adminAddChallengeButton" type="button" onclick="openAdminModal('modalAddChallenge')" hidden>
+                     Agregar reto
+                </button>
+            </div>
+
+            <div class="challenges-grid" id="challengesGrid">
+                <!-- Reto 1 -->
+                <div class="challenge-card" data-default-challenge="default-challenge-bottles" data-challenge-id="default-challenge-bottles" data-challenge-type="weight" data-challenge-material="plastic" data-challenge-target="3" data-challenge-bonus="180">
+                    <div>
+                        <div class="challenge-top">
+                            <span class="challenge-category">RETO</span>
+                            <span class="challenge-bonus">+180 EcoPoints</span>
+                        </div>
+                        <h3 class="challenge-name">Botellas al Rescate</h3>
+                        <p class="challenge-desc">Entrega al menos 3.0 kg de envases plásticos en cualquier punto oficial.</p>
+                        <p class="challenge-time-limit" data-challenge-time>Duración: 7 días</p>
+                        <div class="progress-bar-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Avance del reto">
+                            <div class="progress-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-top: 4px;">
+                            <span class="challenge-progress-label">0.0 / 3.0 kg aprobados</span>
+                            <span class="challenge-progress-percent">0%</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline btn-sm" style="margin-top: 18px; width: 100%;" onclick="openRecycleModal('plastic')">
+                        Registrar peso
+                    </button>
+                </div>
+
+                <!-- Reto 2 -->
+                <div class="challenge-card" data-default-challenge="default-challenge-aluminum" data-challenge-id="default-challenge-aluminum" data-challenge-type="weight" data-challenge-material="aluminum" data-challenge-target="1" data-challenge-bonus="250">
+                    <div>
+                        <div class="challenge-top">
+                            <span class="challenge-category">RETO</span>
+                            <span class="challenge-bonus">+250 EcoPoints</span>
+                        </div>
+                        <h3 class="challenge-name">Rey del Aluminio</h3>
+                        <p class="challenge-desc">Acumula 1.0 kg de latas de aluminio prensadas durante el plazo establecido para el reto.</p>
+                        <p class="challenge-time-limit" data-challenge-time>Duración: 7 días</p>
+                        <div class="progress-bar-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Avance del reto">
+                            <div class="progress-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-top: 4px;">
+                            <span class="challenge-progress-label">0.0 / 1.0 kg aprobados</span>
+                            <span class="challenge-progress-percent">0%</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline btn-sm" style="margin-top: 18px; width: 100%;" type="button" onclick="openRecycleModal('aluminum')">
+                        Registrar peso
+                    </button>
+                </div>
+
+                <!-- Reto 3 -->
+                <div class="challenge-card" data-default-challenge="default-challenge-route" data-challenge-id="default-challenge-route" data-challenge-type="stations" data-challenge-target="2" data-challenge-bonus="100">
+                    <div>
+                        <div class="challenge-top">
+                            <span class="challenge-category">RETO</span>
+                            <span class="challenge-bonus">+100 EcoPoints</span>
+                        </div>
+                        <h3 class="challenge-name">Ruta Verde Urbana</h3>
+                        <p class="challenge-desc">Visita y deposita residuos en al menos 2 estaciones de reciclaje distintas.</p>
+                        <p class="challenge-time-limit" data-challenge-time>Duración: 7 días</p>
+                        <div class="progress-bar-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Avance del reto">
+                            <div class="progress-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-top: 4px;">
+                            <span class="challenge-progress-label">0 de 2 puntos diferentes</span>
+                            <span class="challenge-progress-percent">0%</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline btn-sm" style="margin-top: 18px; width: 100%;" onclick="navigateTo('puntos')">
+                        Ver puntos limpios
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====================================================
+             SECCIÓN 5: RECOMPENSAS
+             ==================================================== -->
+        <section id="sec-recompensas" class="section">
+            <div class="section-admin-header">
+                <div class="section-header">
+                    <h2 class="section-title">Catálogo de Recompensas</h2>
+                    <p class="section-subtitle">Canjea tus EcoPoints acumulados por descuentos en comercios sostenibles y productos ecológicos.</p>
+                </div>
+                <button class="btn btn-primary btn-sm admin-action" id="adminAddRewardButton" type="button" onclick="openAdminModal('modalAddReward')" hidden>
+                     Agregar recompensa
+                </button>
+            </div>
+
+            <div class="rewards-grid" id="rewardsGrid">
+                <article class="reward-card login-bonus-card" id="loginBonusCard" hidden>
+                    <div class="login-bonus-body">
+                        <div class="login-bonus-top">
+                            <span>REGALO DE BIENVENIDA</span>
+                            <strong>GRATIS</strong>
+                        </div>
+                        <h3>Bono por primer inicio de sesión</h3>
+                        <p id="loginBonusMessage" role="status" aria-live="polite">Reclama una sola vez tus 200 EcoPoints de bienvenida.</p>
+                        <div class="login-bonus-bottom">
+                            <strong class="login-bonus-amount">+200 EcoPoints</strong>
+                            <button class="btn btn-primary" id="claimLoginBonusButton" type="button" onclick="claimLoginBonus()">Reclamar gratis</button>
+                        </div>
+                    </div>
+                </article>
+                <!-- Recompensa 1 -->
+                <div class="reward-card" data-default-reward="default-reward-eco-cafe">
+                    <img class="reward-img" src="https://images.unsplash.com/photo-1544816155-12df9643f363?w=500&auto=format&fit=crop&q=80" alt="EcoCafé" loading="lazy">
+                    <div class="reward-body">
+                        <div>
+                            <span style="font-size: 0.75rem; font-weight: 700; color: var(--primary-green-dark); text-transform: uppercase;">Descuento</span>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; margin: 4px 0 8px;">30% en Bebidas EcoCafé</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Válido en cualquier bebida fría o caliente llevando tu propio termo.</p>
+                        </div>
+                        <div>
+                            <div class="reward-cost">400 EcoPoints</div>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="redeemBenefit('Cupón 30% en EcoCafé', 400)">Canjear Recompensa</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recompensa 2 -->
+                <div class="reward-card" data-default-reward="default-reward-bottle">
+                    <img class="reward-img" src="https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=500&auto=format&fit=crop&q=80" alt="Botella térmica" loading="lazy">
+                    <div class="reward-body">
+                        <div>
+                            <span style="font-size: 0.75rem; font-weight: 700; color: var(--primary-green-dark); text-transform: uppercase;">Producto</span>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; margin: 4px 0 8px;">Botella Térmica 750ml</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Fabricada en acero inoxidable grado quirúrgico, libre de BPA.</p>
+                        </div>
+                        <div>
+                            <div class="reward-cost">1,200 EcoPoints</div>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="redeemBenefit('Botella Térmica 750ml', 1200)">Canjear Recompensa</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recompensa 3 -->
+                <div class="reward-card" data-default-reward="default-reward-tree">
+                    <img class="reward-img" src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=500&auto=format&fit=crop&q=80" alt="Siembra de un árbol" loading="lazy">
+                    <div class="reward-body">
+                        <div>
+                            <span style="font-size: 0.75rem; font-weight: 700; color: var(--primary-green-dark); text-transform: uppercase;">Donación Ambiental</span>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; margin: 4px 0 8px;">Siembra un Árbol Nativo</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Aporte para reforestación urbana con certificado digital a tu nombre.</p>
+                        </div>
+                        <div>
+                            <div class="reward-cost">600 EcoPoints</div>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="redeemBenefit('Siembra de Árbol Nativo', 600)">Canjear Recompensa</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====================================================
+             SECCIÓN 6: MI PERFIL
+             ==================================================== -->
+        <section id="sec-perfil" class="section">
+            <div class="section-header profile-section-heading">
+                <div>
+                    <h2 class="section-title">Mi Perfil</h2>
+                    <p class="section-subtitle">Consulta los datos de tu cuenta y actualiza tu nombre de usuario.</p>
+                </div>
+                <button class="btn btn-outline btn-sm admin-manager-shortcut" id="adminManageContentShortcut" type="button" aria-controls="adminContentManager" onclick="scrollToAdminContentManager()" hidden>Administrar contenido</button>
+            </div>
+
+            <div class="profile-layout">
+                <article class="profile-summary-card">
+                    <div class="profile-avatar" id="profileAvatar" aria-hidden="true">EP</div>
+                    <h3 class="profile-summary-name" id="profileDisplayName">Andrea</h3>
+                    <p class="profile-summary-email" id="profileDisplayEmail"></p>
+                    <span class="profile-status">Cuenta activa</span>
+
+                    <div class="profile-points-box">
+                        <span>Saldo disponible</span>
+                        <strong id="profilePoints">0 EcoPoints</strong>
+                    </div>
+
+                    <button class="btn btn-outline profile-home-button" type="button" onclick="navigateTo('inicio')">Volver al inicio
+                    </button>
+                </article>
+
+                <article class="profile-details-card">
+                    <div class="profile-card-heading">
+                        
+                        <div>
+                            <h3>Datos del Usuario</h3>
+                            <p>Información asociada a tu cuenta EcoPoints.</p>
+                        </div>
+                    </div>
+
+                    <form id="profileForm" class="profile-form">
+                        <div class="form-group">
+                            <label class="form-label" for="profileNameInput">Nombre completo</label>
+                            <input
+                                class="form-control"
+                                type="text"
+                                id="profileNameInput"
+                                name="profileName"
+                                minlength="3"
+                                maxlength="60"
+                                autocomplete="name"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="profileEmailDisplay">Correo electrónico</label>
+                            <input class="form-control profile-readonly" type="email" id="profileEmailDisplay" readonly>
+                            <small class="profile-field-note">El correo se utiliza como identificador de acceso y no se modifica desde este apartado.</small>
+                        </div>
+
+                        <div class="profile-data-grid">
+                            <div class="profile-data-item full-width" id="profileAccountTypeItem">
+                                <span>Tipo de cuenta</span>
+                                <strong id="profileAccountType">Administradora</strong>
+                            </div>
+                            <div class="profile-data-item" id="profileCreatedAtItem">
+                                <span>Fecha de registro</span>
+                                <strong id="profileCreatedAt">No disponible</strong>
+                            </div>
+                        </div>
+
+                        
+                        <p class="login-message" id="profileMessage" role="status" aria-live="polite"></p>
+
+                        <button class="btn btn-primary profile-save-button" type="submit">Guardar cambios
+                        </button>
+                    </form>
+                </article>
+            </div>
+
+            <section class="admin-review-panel" id="adminReviewPanel" aria-labelledby="adminReviewTitle" hidden>
+                <div class="section-header">
+                    <h3 class="section-title" id="adminReviewTitle">Evaluar entregas de reciclaje</h3>
+                    <p class="section-subtitle">Verifica el peso de cada entrega. Al aprobarla se actualiza el progreso y se acreditan las bonificaciones que correspondan.</p>
+                </div>
+                <div id="adminPendingDeliveries" class="admin-pending-list" aria-live="polite"></div>
+            </section>
+
+            <section class="admin-review-panel admin-users-panel" id="adminUsersPanel" aria-labelledby="adminUsersTitle" hidden>
+                <div class="section-header">
+                    <h3 class="section-title" id="adminUsersTitle">Usuarios registrados y saldos</h3>
+                    <p class="section-subtitle">Consulta las cuentas y los EcoPoints disponibles de cada usuario.</p>
+                </div>
+                <div id="adminRegisteredUsers" class="admin-users-list" aria-live="polite"></div>
+            </section>
+
+            <section class="admin-review-panel admin-content-manager" id="adminContentManager" aria-labelledby="adminContentManagerTitle" hidden>
+                <div class="section-header">
+                    <h3 class="section-title" id="adminContentManagerTitle">Administrar contenido</h3>
+                    <p class="section-subtitle">Desde aquí puedes retirar puntos de reciclaje, recompensas y retos o misiones del catálogo.</p>
+                </div>
+                <div class="admin-manager-grid">
+                    <div class="admin-manager-group">
+                        <h4>Puntos de reciclaje</h4>
+                        <div id="adminManageLocations" class="admin-manager-list"></div>
+                    </div>
+                    <div class="admin-manager-group">
+                        <h4>Recompensas</h4>
+                        <div id="adminManageRewards" class="admin-manager-list"></div>
+                    </div>
+                    <div class="admin-manager-group">
+                        <h4>Retos y misiones</h4>
+                        <div id="adminManageChallenges" class="admin-manager-list"></div>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+    </main>
+
+    <!-- ==========================================
+         MODAL 1: REGISTRAR RECICLAJE (DEPÓSITO)
+         ========================================== -->
+    <div class="modal-overlay" id="modalRecycle">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalRecycleTitle" tabindex="-1">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalRecycleTitle">Registrar Entrega</h3>
+                <button class="modal-close" type="button" aria-label="Cerrar ventana" onclick="closeModal('modalRecycle')">Cerrar</button>
+            </div>
+            
+            <form onsubmit="handleRecycleSubmit(event)">
+                <div class="form-group">
+                    <label class="form-label" for="recycleType">Tipo de Material</label>
+                    <select id="recycleType" class="form-control" onchange="updateCalcPreview()">
+                        <option value="50" data-material="plastic" selected>Plástico (50 EcoPoints/kg)</option>
+                        <option value="120" data-material="aluminum">Aluminio (120 EcoPoints/kg)</option>
+                        <option value="30" data-material="paper">Papel y Cartón (30 EcoPoints/kg)</option>
+                        <option value="40" data-material="glass">Vidrio (40 EcoPoints/kg)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="recycleWeight">Peso en Kilogramos (kg)</label>
+                    <input type="number" id="recycleWeight" class="form-control" step="0.1" min="0.1" value="" placeholder="Ej. 3.0" oninput="updateCalcPreview()" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="recycleStation">Punto de Entrega</label>
+                    <select id="recycleStation" class="form-control">
+                        <option>Punto Verde Central (Av. Las Américas)</option>
+                        <option>EcoEstación Norte (3er Anillo)</option>
+                        <option>Campus Verde Universitario</option>
+                    </select>
+                </div>
+
+                <div style="background-color: var(--primary-green-soft); border-radius: var(--radius-md); padding: 14px; margin-bottom: 18px; text-align: center;">
+                    <div style="font-size: 0.8rem; color: var(--primary-green-deep); font-weight: 600;">Puntos estimados (sujetos a revisión):</div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: var(--primary-green-dark);" id="previewPoints">+75 EcoPoints</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Enviar entrega para revisión</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL 2: VOUCHER DE CANJE
+         ========================================== -->
+    <div class="modal-overlay" id="modalVoucher">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalVoucherTitle" tabindex="-1" style="text-align: center;">
+<h3 class="modal-title" id="modalVoucherTitle" style="margin-bottom: 6px;">Canje exitoso</h3>
+            <p id="voucherItemName" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">Premio</p>
+<p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px;">
+                Código: <strong style="color: var(--primary-green-dark);">ECO-CANJE-8821</strong><br>
+                Presenta este código en el establecimiento asociado para hacer efectivo tu beneficio.
+            </p>
+
+            <button class="btn btn-primary" style="width: 100%;" onclick="closeModal('modalVoucher')">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL ADMINISTRADOR: AGREGAR PUNTO DE RECICLAJE
+         ========================================== -->
+    <div class="modal-overlay" id="modalAddPoint">
+        <div class="modal-content admin-modal-content" role="dialog" aria-modal="true" aria-labelledby="modalAddPointTitle" tabindex="-1">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalAddPointTitle">Agregar punto de reciclaje</h3>
+                <button class="modal-close" type="button" aria-label="Cerrar ventana" onclick="closeModal('modalAddPoint')">Cerrar</button>
+            </div>
+            <form id="adminPointForm" class="admin-form">
+                <div class="form-group">
+                    <label class="form-label" for="newPointName">Nombre del punto</label>
+                    <input class="form-control" type="text" id="newPointName" maxlength="70" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="newPointAddress">Dirección o referencia</label>
+                    <input class="form-control" type="text" id="newPointAddress" maxlength="120" required>
+                </div>
+                <div class="admin-form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="newPointLat">Latitud</label>
+                        <input class="form-control" type="number" id="newPointLat" min="-90" max="90" step="any" placeholder="-17.7833" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="newPointLng">Longitud</label>
+                        <input class="form-control" type="number" id="newPointLng" min="-180" max="180" step="any" placeholder="-63.1821" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="newPointMaterials">Materiales aceptados</label>
+                    <input class="form-control" type="text" id="newPointMaterials" placeholder="Plástico, vidrio, papel" maxlength="120" required>
+                </div>
+                <div class="admin-form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="newPointHours">Horario de atención (opcional)</label>
+                        <input class="form-control" type="text" id="newPointHours" maxlength="100" placeholder="Lun a vie, 08:00 a 17:00">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="newPointPhone">Teléfono (opcional)</label>
+                        <input class="form-control" type="tel" id="newPointPhone" maxlength="30" placeholder="Ej. 70000000">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="newPointNotes">Información adicional (opcional)</label>
+                    <textarea class="form-control" id="newPointNotes" rows="2" maxlength="180" placeholder="Indicaciones para encontrar el punto o condiciones de entrega"></textarea>
+                </div>
+                <p class="admin-form-note">Ingresa las coordenadas del lugar para ubicar el nuevo punto en el mapa. Los horarios, el teléfono y la información adicional son opcionales.</p>
+                <p class="login-message" id="adminPointMessage" role="status" aria-live="polite"></p>
+                <button class="btn btn-primary admin-form-submit" type="submit">Guardar punto de reciclaje</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL ADMINISTRADOR: AGREGAR RECOMPENSA
+         ========================================== -->
+    <div class="modal-overlay" id="modalAddReward">
+        <div class="modal-content admin-modal-content" role="dialog" aria-modal="true" aria-labelledby="modalAddRewardTitle" tabindex="-1">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalAddRewardTitle">Agregar recompensa</h3>
+                <button class="modal-close" type="button" aria-label="Cerrar ventana" onclick="closeModal('modalAddReward')">Cerrar</button>
+            </div>
+            <form id="adminRewardForm" class="admin-form">
+                <div class="form-group">
+                    <label class="form-label" for="newRewardType">Tipo de recompensa</label>
+                    <select class="form-control" id="newRewardType" required>
+                        <option value="Producto">Producto</option>
+                        <option value="Descuento">Descuento</option>
+                        <option value="Donación ambiental">Donación ambiental</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="newRewardName">Nombre de la recompensa</label>
+                    <input class="form-control" type="text" id="newRewardName" maxlength="70" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="newRewardDescription">Descripción</label>
+                    <textarea class="form-control" id="newRewardDescription" rows="3" maxlength="220" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="newRewardCost">Costo en EcoPoints</label>
+                    <input class="form-control" type="number" id="newRewardCost" min="1" step="1" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="newRewardImage">Imagen de la recompensa</label>
+                    <input class="form-control" type="file" id="newRewardImage" accept="image/jpeg,image/png,image/webp" required>
+                    <small class="profile-field-note">Selecciona una imagen JPG, PNG o WebP. El sistema ajusta su tamaño para guardarla en el navegador. Máximo 8 MB.</small>
+                    <img id="newRewardImagePreview" class="admin-image-preview" alt="Vista previa de la recompensa" hidden>
+                </div>
+                <p class="login-message" id="adminRewardMessage" role="status" aria-live="polite"></p>
+                <button class="btn btn-primary admin-form-submit" type="submit">Guardar recompensa</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL ADMINISTRADOR: AGREGAR RETO
+         ========================================== -->
+    <div class="modal-overlay" id="modalAddChallenge">
+        <div class="modal-content admin-modal-content" role="dialog" aria-modal="true" aria-labelledby="modalAddChallengeTitle" tabindex="-1">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalAddChallengeTitle">Agregar reto ambiental</h3>
+                <button class="modal-close" type="button" aria-label="Cerrar ventana" onclick="closeModal('modalAddChallenge')">Cerrar</button>
+            </div>
+            <form id="adminChallengeForm" class="admin-form">
+                <div class="form-group">
+                    <label class="form-label" for="newChallengeName">Nombre del reto</label>
+                    <input class="form-control" type="text" id="newChallengeName" maxlength="70" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="newChallengeDescription">Descripción y objetivo</label>
+                    <textarea class="form-control" id="newChallengeDescription" rows="3" maxlength="220" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="newChallengeMaterial">Material que cuenta para el reto</label>
+                    <select class="form-control" id="newChallengeMaterial" required>
+                        <option value="">Selecciona un material</option>
+                        <option value="plastic">Plástico</option>
+                        <option value="aluminum">Aluminio</option>
+                        <option value="paper">Papel y cartón</option>
+                        <option value="glass">Vidrio</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="newChallengeTargetKg">Meta de reciclaje (kg)</label>
+                    <input class="form-control" type="number" id="newChallengeTargetKg" min="0.1" step="0.1" placeholder="Ej. 3" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="newChallengeBonus">Bonificación en EcoPoints por cada meta completada</label>
+                    <input class="form-control" type="number" id="newChallengeBonus" min="1" step="1" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="newChallengeDuration">Duración del reto (días)</label>
+                    <input class="form-control" type="number" id="newChallengeDuration" min="1" max="365" step="1" value="7" required>
+                </div>
+                <p class="login-message" id="adminChallengeMessage" role="status" aria-live="polite"></p>
+                <button class="btn btn-primary admin-form-submit" type="submit">Guardar reto</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         PIE DE PÁGINA (FOOTER)
+         ========================================== -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="footer-logo-mark" aria-hidden="true">E</span>
+                <strong>EcoPoints</strong>
+            </div>
+            <p>Plataforma de reciclaje y sostenibilidad.</p>
+            <small>Pequeñas acciones generan grandes cambios.</small>
+        </div>
+    </footer>
+
+    <!-- Control de sesion y logica principal -->
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
