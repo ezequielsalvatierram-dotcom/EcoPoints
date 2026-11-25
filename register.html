@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Crea tu cuenta gratuita en EcoPoints.">
+    <title>EcoPoints | Crear cuenta</title>
+    <link rel="icon" type="image/svg+xml" href="img/ecopoints-icon.svg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="login-page">
+    <main class="login-card register-card">
+        <a class="login-brand" href="login.html" aria-label="EcoPoints - Inicio">
+            <span class="login-logo" aria-hidden="true">E</span>
+            <span>EcoPoints</span>
+        </a>
+
+        <div class="login-heading">
+            <h1>Crear una cuenta</h1>
+            <p>Únete a EcoPoints y comienza a convertir tus acciones ecológicas en logros.</p>
+        </div>
+
+        <form id="registerForm" class="login-form">
+            <div class="form-group">
+                <label class="form-label" for="registerName">Nombre completo</label>
+                <input
+                    class="form-control"
+                    type="text"
+                    id="registerName"
+                    name="name"
+                    placeholder="Escribe tu nombre"
+                    autocomplete="name"
+                    minlength="3"
+                    maxlength="60"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="registerEmail">Correo electrónico</label>
+                <input
+                    class="form-control"
+                    type="email"
+                    id="registerEmail"
+                    name="email"
+                    placeholder="tunombre@correo.com"
+                    autocomplete="email"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="registerPassword">Contraseña</label>
+                <input
+                    class="form-control"
+                    type="password"
+                    id="registerPassword"
+                    name="password"
+                    placeholder="Mínimo 6 caracteres"
+                    autocomplete="new-password"
+                    minlength="6"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="confirmPassword">Confirmar contraseña</label>
+                <input
+                    class="form-control"
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    placeholder="Repite tu contraseña"
+                    autocomplete="new-password"
+                    minlength="6"
+                    required
+                >
+            </div>
+
+            <p id="registerMessage" class="login-message" role="alert" aria-live="polite"></p>
+
+            <button class="btn btn-primary login-submit" type="submit">
+                
+                Crear cuenta
+            </button>
+        </form>
+
+        <p class="auth-switch">¿Ya tienes una cuenta? <a href="login.html">Inicia sesión</a></p>
+        <p class="auth-note">Tus datos de cuenta se guardan en este navegador. Esta versión es una demostración local.</p>
+        <p class="login-footer">Pequeñas acciones generan grandes cambios.</p>
+    </main>
+
+    <script src="js/auth.js"></script>
+</body>
+</html>
